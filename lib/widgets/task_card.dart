@@ -9,12 +9,12 @@ class TaskCard extends StatelessWidget {
   final List<String> prioridades;
 
   const TaskCard({
-    Key? key,
+    super.key,
     required this.task,
     required this.onConcluir,
     required this.onExcluir,
     required this.prioridades,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +86,13 @@ class TaskCard extends StatelessWidget {
                 children: [
                   _buildBadge(
                     'Categoria: ${task.categoria}',
-                    const Color.fromARGB(255, 99, 69, 150),
+                    task.categoria == 'Estudo'
+                        ? Colors.blue
+                        : task.categoria == 'Trabalho'
+                        ? Colors.brown
+                        : task.categoria == 'Pessoal'
+                        ? Colors.pink
+                        : Colors.purple,
                   ),
                   _buildBadge(
                     'Prioridade: ${prioridades[task.prioridade]}',
@@ -125,7 +131,7 @@ class TaskCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.1), //Fornece um efeito opaco.
         border: Border.all(color: color),
         borderRadius: BorderRadius.circular(20),
       ),

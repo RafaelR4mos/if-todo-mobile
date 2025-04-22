@@ -78,18 +78,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildBadge(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        border: Border.all(color: color),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(label, style: TextStyle(color: color, fontSize: 12)),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

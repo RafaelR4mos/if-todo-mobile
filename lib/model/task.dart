@@ -21,7 +21,7 @@ class Task {
     this.updatedAt,
   });
 
-  // Para salvar em banco/local storage/JSON
+  // Para salvar em banco
   Map<String, dynamic> toMap() {
     return {
       'title': titulo,
@@ -35,7 +35,7 @@ class Task {
     };
   }
 
-  // Para ler de banco/JSON e criar uma Task
+  // Para ler do banco/JSON e criar uma Task
   factory Task.fromMap(Map<String, dynamic> map) {
     return Task(
       idTask: int.tryParse('${map['id_task']}') ?? 0,
@@ -46,8 +46,8 @@ class Task {
       dataTermino:
           map['due_date'] != null ? DateTime.parse(map['due_date']) : null,
       isCompleted: map['is_completed'] ?? false,
-      createdAt: map['created_at'] ?? null,
-      updatedAt: map['updated_at'] ?? null,
+      createdAt: map['created_at'],
+      updatedAt: map['updated_at'],
     );
   }
 }

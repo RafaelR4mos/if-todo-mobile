@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class TaskService {
+  // ignore: constant_identifier_names
   static const String BASE_URL =
       'http://200.19.1.19/20222GR.ADS0011/api-php/Controller/crud-task.php';
 

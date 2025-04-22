@@ -9,11 +9,11 @@ class TaskForm extends StatefulWidget {
   final List<String> prioridades;
 
   const TaskForm({
-    Key? key,
+    super.key,
     required this.onSave,
     required this.categorias,
     required this.prioridades,
-  }) : super(key: key);
+  });
 
   @override
   State<TaskForm> createState() => _TaskFormState();
