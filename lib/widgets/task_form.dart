@@ -129,44 +129,67 @@ class _TaskFormState extends State<TaskForm> {
               const SizedBox(height: 18),
 
               // Data de término
-              InkWell(
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: dataSelecionada ?? DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2100),
-                    builder: (context, child) {
-                      return Theme(
-                        data: Theme.of(context).copyWith(
-                          colorScheme: const ColorScheme.dark(
-                            primary: Colors.deepPurple,
-                            onPrimary: Colors.white,
-                            surface: Colors.black87,
-                            onSurface: Colors.white,
-                          ),
-                          dialogTheme: const DialogTheme(
-                            backgroundColor: Colors.black,
+              FormField<DateTime>(
+                validator: (value) {
+                  if (dataSelecionada == null) {
+                    return 'Selecione uma data de término';
+                  }
+                  return null;
+                },
+                builder: (formFieldState) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: dataSelecionada ?? DateTime.now(),
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime(2100),
+                            builder: (context, child) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: const ColorScheme.dark(
+                                    primary: Colors.deepPurple,
+                                    onPrimary: Colors.white,
+                                    surface: Colors.black87,
+                                    onSurface: Colors.white,
+                                  ),
+                                  dialogTheme: const DialogTheme(
+                                    backgroundColor: Colors.black,
+                                  ),
+                                ),
+                                child: child!,
+                              );
+                            },
+                          );
+                          if (picked != null) {
+                            setState(() {
+                              dataSelecionada = picked;
+                              formFieldState.didChange(picked);
+                            });
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: _inputDecoration(
+                            'Data de Término',
+                          ).copyWith(errorText: formFieldState.errorText),
+                          child: Text(
+                            dataSelecionada != null
+                                ? DateFormat(
+                                  'dd/MM/yyyy',
+                                ).format(dataSelecionada!)
+                                : 'Selecionar data',
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
-                        child: child!,
-                      );
-                    },
+                      ),
+                    ],
                   );
-                  if (picked != null) {
-                    setState(() => dataSelecionada = picked);
-                  }
                 },
-                child: InputDecorator(
-                  decoration: _inputDecoration('Data de Término'),
-                  child: Text(
-                    dataSelecionada != null
-                        ? DateFormat('dd/MM/yyyy').format(dataSelecionada!)
-                        : 'Selecionar data',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
               ),
+
               const SizedBox(height: 12),
 
               // Botão Criar

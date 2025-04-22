@@ -138,14 +138,48 @@ class _HomeState extends State<Home> {
                       if (sucesso) carregarTarefas();
                     },
                     onExcluir: () async {
-                      final sucesso = await TaskService.deleteTask(task.idTask);
-                      if (!mounted) return;
-                      if (sucesso) carregarTarefas();
+                      final confirmar = await showDialog<bool>(
+                        context: context,
+                        builder:
+                            (ctx) => AlertDialog(
+                              title: const Text('Confirmar exclusão'),
+                              content: const Text(
+                                'Tem certeza que deseja excluir esta tarefa?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text('Cancelar'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: const Text('Excluir'),
+                                ),
+                              ],
+                            ),
+                      );
+
+                      if (confirmar == true) {
+                        final sucesso = await TaskService.deleteTask(
+                          task.idTask,
+                        );
+                        if (!mounted) return;
+                        if (sucesso) {
+                          carregarTarefas();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Erro ao excluir tarefa'),
+                            ),
+                          );
+                        }
+                      }
                     },
                     prioridades: prioridades,
                   );
                 },
               ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: _abrirBottomSheetNovaTask,
         tooltip: 'Abrir sheet nova task',
