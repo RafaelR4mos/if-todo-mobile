@@ -134,6 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void carregarTarefas() async {
     try {
       final tarefasCarregadas = await fetchTasks();
+      if (!mounted) return;
       setState(() {
         tarefas = tarefasCarregadas;
       });
@@ -379,7 +380,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               if (!mounted) return;
 
                               if (sucesso) {
-                                Navigator.of(context).pop();
                                 carregarTarefas(); // recarrega a lista do banco
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -402,6 +402,18 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildBadge(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.2),
+        border: Border.all(color: color),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(label, style: TextStyle(color: color, fontSize: 12)),
     );
   }
 
@@ -443,76 +455,143 @@ class _MyHomePageState extends State<MyHomePage> {
                 itemCount: tarefas.length,
                 itemBuilder: (context, index) {
                   final task = tarefas[index];
-                  return ListTile(
-                    leading: IconButton(
-                      icon: Icon(
-                        task.isCompleted
-                            ? Icons.check_circle
-                            : Icons.check_circle_outline,
-                        color: task.isCompleted ? Colors.green : Colors.grey,
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Card(
+                      color: Colors.grey[900],
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      onPressed:
-                          task.isCompleted
-                              ? null
-                              : () async {
-                                final sucesso = await concluirTask(task.idTask);
-                                if (!mounted) return;
-                                if (sucesso) {
-                                  carregarTarefas();
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Erro ao concluir tarefa'),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Título + status
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    task.titulo,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      decoration:
+                                          task.isCompleted
+                                              ? TextDecoration.lineThrough
+                                              : null,
                                     ),
-                                  );
-                                }
-                              },
-                    ),
-                    title: Text(
-                      task.titulo,
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (task.descricao != null &&
-                            task.descricao!.isNotEmpty)
-                          Text(
-                            task.descricao!,
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                        Text(
-                          'Categoria: ${task.categoria}',
-                          style: TextStyle(color: Colors.white54),
-                        ),
-                        Text(
-                          'Prioridade: ${prioridades[task.prioridade]}',
-                          style: TextStyle(color: Colors.white54),
-                        ),
-                        if (task.dataTermino != null)
-                          Text(
-                            'Término: ${task.dataTermino!.day.toString().padLeft(2, '0')}/'
-                            '${task.dataTermino!.month.toString().padLeft(2, '0')}/'
-                            '${task.dataTermino!.year}',
-                            style: TextStyle(color: Colors.white54),
-                          ),
-                        IconButton(
-                          icon: Icon(Icons.delete_forever),
-                          onPressed: () async {
-                            final sucesso = await deleteTask(task.idTask);
-                            if (!mounted) return;
-                            if (sucesso) {
-                              carregarTarefas();
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Erro ao excluir tarefa'),
+                                  ),
                                 ),
-                              );
-                            }
-                          },
+                                IconButton(
+                                  icon: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 500),
+                                    child: Icon(
+                                      task.isCompleted
+                                          ? Icons.check_circle
+                                          : Icons.check_circle_outline,
+                                      key: ValueKey(task.isCompleted),
+                                      color:
+                                          task.isCompleted
+                                              ? Colors.green
+                                              : Colors.grey,
+                                    ),
+                                  ),
+
+                                  onPressed:
+                                      task.isCompleted
+                                          ? null
+                                          : () async {
+                                            final sucesso = await concluirTask(
+                                              task.idTask,
+                                            );
+                                            if (!mounted) return;
+                                            if (sucesso) {
+                                              carregarTarefas();
+                                            } else {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Erro ao concluir tarefa',
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete_forever,
+                                    color: Colors.redAccent,
+                                  ),
+                                  onPressed: () async {
+                                    final sucesso = await deleteTask(
+                                      task.idTask,
+                                    );
+                                    if (!mounted) return;
+                                    if (sucesso) {
+                                      carregarTarefas();
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Erro ao excluir tarefa',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            if (task.descricao != null &&
+                                task.descricao!.isNotEmpty)
+                              Text(
+                                task.descricao!,
+                                style: const TextStyle(color: Colors.white70),
+                              ),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              spacing: 10,
+                              children: [
+                                _buildBadge(
+                                  'Categoria: ${task.categoria}',
+                                  const Color.fromARGB(255, 99, 69, 150),
+                                ),
+                                _buildBadge(
+                                  'Prioridade: ${prioridades[task.prioridade]}',
+                                  task.prioridade == 0
+                                      ? Colors.green
+                                      : task.prioridade == 1
+                                      ? Colors.orange
+                                      : Colors.red,
+                                ),
+                                if (task.dataTermino != null)
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 8),
+                                    child: _buildBadge(
+                                      'Término: ${task.dataTermino!.day.toString().padLeft(2, '0')}/'
+                                      '${task.dataTermino!.month.toString().padLeft(2, '0')}/'
+                                      '${task.dataTermino!.year}',
+                                      Colors.blueGrey,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   );
                 },
