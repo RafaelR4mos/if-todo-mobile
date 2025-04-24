@@ -116,54 +116,57 @@ class _HomeState extends State<Home> {
                 itemCount: tarefas.length,
                 itemBuilder: (context, index) {
                   final task = tarefas[index];
-                  return TaskCard(
-                    task: task,
-                    onConcluir: () async {
-                      final sucesso = await TaskService.concluirTask(
-                        task.idTask,
-                      );
-                      if (!mounted) return;
-                      if (sucesso) carregarTarefas();
-                    },
-                    onExcluir: () async {
-                      final confirmar = await showDialog<bool>(
-                        context: context,
-                        builder:
-                            (ctx) => AlertDialog(
-                              title: const Text('Confirmar exclusão'),
-                              content: const Text(
-                                'Tem certeza que deseja excluir esta tarefa?',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx, false),
-                                  child: const Text('Cancelar'),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx, true),
-                                  child: const Text('Excluir'),
-                                ),
-                              ],
-                            ),
-                      );
-
-                      if (confirmar == true) {
-                        final sucesso = await TaskService.deleteTask(
+                  return Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: TaskCard(
+                      task: task,
+                      onConcluir: () async {
+                        final sucesso = await TaskService.concluirTask(
                           task.idTask,
                         );
                         if (!mounted) return;
-                        if (sucesso) {
-                          carregarTarefas();
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Erro ao excluir tarefa'),
-                            ),
+                        if (sucesso) carregarTarefas();
+                      },
+                      onExcluir: () async {
+                        final confirmar = await showDialog<bool>(
+                          context: context,
+                          builder:
+                              (ctx) => AlertDialog(
+                                title: const Text('Confirmar exclusão'),
+                                content: const Text(
+                                  'Tem certeza que deseja excluir esta tarefa?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, false),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, true),
+                                    child: const Text('Excluir'),
+                                  ),
+                                ],
+                              ),
+                        );
+
+                        if (confirmar == true) {
+                          final sucesso = await TaskService.deleteTask(
+                            task.idTask,
                           );
+                          if (!mounted) return;
+                          if (sucesso) {
+                            carregarTarefas();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Erro ao excluir tarefa'),
+                              ),
+                            );
+                          }
                         }
-                      }
-                    },
-                    prioridades: prioridades,
+                      },
+                      prioridades: prioridades,
+                    ),
                   );
                 },
               ),
